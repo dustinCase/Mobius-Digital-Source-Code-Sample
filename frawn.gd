@@ -3,6 +3,7 @@
 
 extends CharacterBody2D
 
+# References to other nodes
 @onready var animated_sprite = $AnimatedSprite2D
 @onready var animation_player = $AnimationPlayer
 @onready var collision_shape = $CollisionShape2D
@@ -19,14 +20,14 @@ extends CharacterBody2D
 
 @export var camera: Camera2D
 
-const SPEED = 65.0
-const MAX_JUMP = 105.0
-const JUMP_INC = 270.0 # This is the ammount h increases per second
-const HOR_JUMP_VEL = 210
-const MAX_JUMP_VEL = 485
+const SPEED = 65.0  # The walking speed of the character
+const MAX_JUMP = 105.0  # The max height a jump can get
+const JUMP_INC = 270.0  # This is the ammount jump_height increases per second
+const MAX_HOR_JUMP_VEL = 210  # The maximum horizontal jump velocity 
+const MAX_VERT_JUMP_VEL = 485  # The maximum vertical jump velocity 
 
 var jump_height = 0  # the height of the jump
-var jump_frame = -1
+var jump_frame = -1  # Tracks which jump frame is being shown. -1 means not jumping
 
 
 # NOT: when Frawn is not jumping. Set after a successful jump
@@ -198,7 +199,7 @@ func process_jump_physics(delta, direction):
 			else:
 				direction = 1
 		velocity.y = sqrt(jump_height * 2 * get_gravity().y) * -1
-		velocity.x = HOR_JUMP_VEL * (jump_height / MAX_JUMP) * direction
+		velocity.x = MAX_HOR_JUMP_VEL * (jump_height / MAX_JUMP) * direction
 		jump_height = 0
 	
 	# True while the player is in the air
@@ -235,15 +236,15 @@ func cancel_jump():
 
 # Takes in a vertical velocity and matches it to the corresponding frame of the jump arc via set_jump_frame()
 func play_jump_animation(vel_y):
-	if -MAX_JUMP_VEL < vel_y and jump_frame == 1:
+	if -MAX_VERT_JUMP_VEL < vel_y and jump_frame == 1:
 		set_jump_frame(2)
-	elif -MAX_JUMP_VEL * 0.385 <= vel_y and jump_frame == 2:
+	elif -MAX_VERT_JUMP_VEL * 0.385 <= vel_y and jump_frame == 2:
 		set_jump_frame(3)
-	elif -MAX_JUMP_VEL * 0.154 <= vel_y and jump_frame == 3:
+	elif -MAX_VERT_JUMP_VEL * 0.154 <= vel_y and jump_frame == 3:
 		set_jump_frame(4)
-	elif MAX_JUMP_VEL * 0.154 < vel_y and jump_frame == 4:
+	elif MAX_VERT_JUMP_VEL * 0.154 < vel_y and jump_frame == 4:
 		set_jump_frame(5)
-	elif MAX_JUMP_VEL * 0.385 < vel_y and jump_frame == 5 and !ray_cast_down_right.is_colliding() and !ray_cast_down_left.is_colliding():
+	elif MAX_VERT_JUMP_VEL * 0.385 < vel_y and jump_frame == 5 and !ray_cast_down_right.is_colliding() and !ray_cast_down_left.is_colliding():
 		set_jump_frame(6)
 
 
